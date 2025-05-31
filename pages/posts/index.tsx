@@ -1,47 +1,67 @@
-import PostCard from "@/components/common/PostCard";
-import Header from "@/components/layout/Header";
-import { PostProps } from "@/interfaces";
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import PostModal from '@/components/common/PostModal';
 
-interface PostsPageProps {
-  posts: PostProps[];
+interface Post {
+  id: number;
+  title: string;
+  body: string;
 }
 
-const Posts: React.FC<PostsPageProps> = ({ posts }) => {
+export default function PostsPage() {
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      const res = await fetch('https://jsonplaceholder.typicode.com/posts?_limit=10');
+      const data = await res.json();
+      setPosts(data);
+      setLoading(false);
+    };
+    fetchPosts();
+  }, []);
+
+  const handleAddPost = (newPost: { title: string; body: string }) => {
+    const newPostWithId: Post = {
+      id: posts.length + 1,
+      ...newPost,
+    };
+    setPosts([newPostWithId, ...posts]);
+  };
+
   return (
-    <div className="flex flex-col h-screen">
-      <Header />
-      <main className="p-4">
-        <div className="flex justify-between mb-4">
-          <h1 className="text-2xl font-semibold">Post Content</h1>
-          <button className="bg-blue-700 px-4 py-2 rounded-full text-white">
-            Add Post
-          </button>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="min-h-screen p-4 bg-gray-100">
+      <h1 className="text-2xl font-bold mb-4">Posts</h1>
+
+      <button
+        onClick={() => setIsModalOpen(true)}
+        className="mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+      >
+        Add Post
+      </button>
+
+      {loading ? (
+        <p>Loading...</p>
+      ) : (
+        <div className="space-y-4">
           {posts.map((post) => (
-            <PostCard
-              key={post.id}
-              title={post.title}
-              body={post.body}
-              userId={post.userId}
-              id={post.id}
-            />
+            <div key={post.id} className="p-4 bg-white rounded shadow">
+              <Link href={`/posts/${post.id}`}>
+                <h2 className="text-lg font-semibold hover:underline">{post.title}</h2>
+              </Link>
+              <p className="text-sm text-gray-600">{post.body}</p>
+            </div>
           ))}
         </div>
-      </main>
+      )}
+
+      <PostModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleAddPost}
+      />
     </div>
   );
-};
-
-export async function getStaticProps() {
-  const response = await fetch("https://jsonplaceholder.typicode.com/posts");
-  const posts = await response.json();
-
-  return {
-    props: {
-      posts,
-    },
-  };
 }
-
-export default Posts;
