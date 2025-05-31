@@ -1,25 +1,24 @@
-import React from 'react';
+// components/layout/Header.tsx
 import Link from 'next/link';
 
 const Header: React.FC = () => {
   return (
-    <header style={{ 
-      padding: '20px', 
-      backgroundColor: '#0070f3', 
-      color: 'white',
-      marginBottom: '30px'
-    }}>
-      <nav>
-        <Link href="/" style={{ marginRight: '15px', color: 'white', textDecoration: 'none' }}>
-          Home
-        </Link>
-        <Link href="/posts" style={{ marginRight: '15px', color: 'white', textDecoration: 'none' }}>
-          Posts
-        </Link>
-        <Link href="/users" style={{ color: 'white', textDecoration: 'none' }}>
-          Users
-        </Link>
-      </nav>
+    <header className="bg-blue-600 text-white shadow-md py-4">
+      <div className="container mx-auto flex justify-between items-center px-4">
+        <h3 className="font-bold text-2xl">
+          <Link href="/">Daily Contents</Link>
+        </h3>
+        <nav>
+          <ul className="flex space-x-6">
+            <li className="hover:underline">
+              <Link href="/posts">Posts</Link>
+            </li>
+            <li className="hover:underline">
+              <Link href="/users">Users</Link>
+            </li>
+          </ul>
+        </nav>
+      </div>
     </header>
   );
 };
